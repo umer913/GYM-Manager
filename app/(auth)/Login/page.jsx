@@ -11,7 +11,7 @@ import Card from "../../../components/Card";
 export default function LoginPage() {
   const router = useRouter();
   const { setUser } = useAppContext();
-  const [form, setForm] = useState({email: "",password: "",});
+  const [form, setForm] = useState({ email: "", password: "", });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -19,35 +19,41 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      alert(data.message || "Login failed");
-      setLoading(false); // ✅ FIX
-      return;
+      if (!res.ok) {
+        alert(data.message || "Login failed");
+        setLoading(false); // ✅ FIX
+        return;
+      }
+
+      alert("Login successful");
+      localStorage.setItem("token", data.token);
+      setUser(data.user); // Store full user object (name, email, role)
+
+      // Role-based routing
+      if (data.user.role === "Manager") {
+        router.push("/GymManagerDashboard");
+      } else {
+        router.push("/MemberDashboard");
+      }
+
+    } catch (err) {
+      alert("Something went wrong");
+    } finally {
+      setLoading(false); // ✅ always runs
     }
-
-    alert("Login successful");
-    localStorage.setItem("token", data.token);
-    setUser({ email: form.email }); // Set user in context (extend as needed)
-    router.push("/dashboard");
-
-  } catch (err) {
-    alert("Something went wrong");
-  } finally {
-    setLoading(false); // ✅ always runs
-  }
-};
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950">
       <Card>

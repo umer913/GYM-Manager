@@ -6,7 +6,7 @@ import { useAppContext } from "../../../context/AppContext";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import Card from "../../../components/Card";
-import { useRouter } from "next/navigation";
+
 export default function VerifyOtpPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -14,9 +14,18 @@ export default function VerifyOtpPage() {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(30); // 30 seconds timer
   const { user } = useAppContext(); // Example usage of context
-  // Timer effect
+  // Timer effect — delete unverified record when time runs out
   useEffect(() => {
     if (timer === 0) {
+      // Clean up the unverified user from DB
+      if (email) {
+        fetch("/api/auth/cleanup-unverified", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }).catch(() => {});
+      }
+      alert("OTP expired. Please sign up again.");
       router.push("/Login");
       return;
     }
@@ -24,7 +33,7 @@ export default function VerifyOtpPage() {
       setTimer((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [timer, router]);
+  }, [timer, router, email]);
 
   const handleVerify = async (e) => {
     e.preventDefault();

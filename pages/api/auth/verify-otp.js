@@ -19,7 +19,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: 'User already verified' });
     }
     if (user.otp !== otp || user.otpExpires < new Date()) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+      // Delete unverified user record on failed OTP
+      await User.deleteOne({ _id: user._id, isVerified: false });
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP. Account removed — please sign up again.' });
     }
     user.isVerified = true;
     user.otp = undefined;
