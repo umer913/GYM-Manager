@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Sidebar from "./Sidebar";
 
 // ── Mini sparkline SVG ──────────────────────────────────────────────
 function Sparkline({ data, color = "#ef4444" }) {
+  if (!data || data.length === 0) return null;
   const max = Math.max(...data);
   const min = Math.min(...data);
   const w = 80, h = 32;
   const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
+    const x = (i / (data.length - 1 || 1)) * w;
     const y = h - ((v - min) / (max - min || 1)) * h;
     return `${x},${y}`;
   }).join(" ");
@@ -25,6 +27,10 @@ function Sparkline({ data, color = "#ef4444" }) {
 function AnimatedNum({ target, prefix = "", suffix = "" }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
+    if (target === 0) {
+      setVal(0);
+      return;
+    }
     let start = 0;
     const step = Math.ceil(target / 40);
     const t = setInterval(() => {
@@ -39,7 +45,7 @@ function AnimatedNum({ target, prefix = "", suffix = "" }) {
 
 // ── Progress Bar ────────────────────────────────────────────────────
 function ProgressBar({ label, value, max, color = "from-red-500 to-orange-500" }) {
-  const pct = Math.round((value / max) * 100);
+  const pct = Math.round((value / (max || 1)) * 100);
   return (
     <div className="mb-4">
       <div className="flex justify-between text-sm mb-1">
@@ -65,7 +71,7 @@ function BarChart({ data, labels, color = "#ef4444" }) {
         <div key={i} className="flex flex-col items-center flex-1 gap-1">
           <span className="text-xs text-zinc-500">{v}k</span>
           <div className="w-full rounded-t-md transition-all duration-700"
-            style={{ height: `${(v / max) * 110}px`, background: `linear-gradient(to top, ${color}99, ${color})` }} />
+            style={{ height: `${(v / (max || 1)) * 110}px`, background: `linear-gradient(to top, ${color}99, ${color})` }} />
           <span className="text-xs text-zinc-500 truncate w-full text-center">{labels[i]}</span>
         </div>
       ))}
@@ -84,7 +90,7 @@ function DonutChart({ segments }) {
       <svg width="100" height="100" viewBox="0 0 100 100">
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#27272a" strokeWidth={stroke} />
         {segments.map((seg, i) => {
-          const dash = (seg.value / total) * circ;
+          const dash = (seg.value / (total || 1)) * circ;
           const offset = circ - cumulative;
           cumulative += dash;
           return (
@@ -143,90 +149,40 @@ function KpiCard({ icon, label, value, prefix = "", suffix = "", trend, sparkDat
   );
 }
 
-// ── Sidebar ─────────────────────────────────────────────────────────
-function Sidebar({ active }) {
-  const links = [
-    { icon: "⊞", label: "Dashboard" },
-    { icon: "👥", label: "Members" },
-    { icon: "🏋️", label: "Trainers" },
-    { icon: "📅", label: "Check-ins" },
-    { icon: "💳", label: "Memberships" },
-    { icon: "💰", label: "Revenue" },
-    { icon: "⚙️", label: "Settings" },
-  ];
-  return (
-    <aside className="hidden lg:flex flex-col w-60 min-h-screen bg-zinc-950 border-r border-zinc-800/60 px-4 py-6 fixed top-0 left-0 z-30">
-      <div className="flex items-center gap-2 mb-10 px-2">
-        <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M5 6v12m14-12v12" />
-        </svg>
-        <span className="text-xl font-black uppercase">Fit<span className="text-red-600">core</span></span>
-      </div>
-      <nav className="flex flex-col gap-1 flex-1">
-        {links.map((l) => (
-          <button key={l.label}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-              ${l.label === active
-                ? "bg-gradient-to-r from-red-600/20 to-orange-600/10 text-white border border-red-500/30"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"}`}>
-            <span>{l.icon}</span>{l.label}
-          </button>
-        ))}
-      </nav>
-      <div className="mt-6 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-        <p className="text-xs text-zinc-500 mb-1">Logged in as</p>
-        <p className="text-sm font-semibold text-white">Gym Manager</p>
-        <span className="text-xs bg-red-600/20 text-red-400 px-2 py-0.5 rounded-full border border-red-500/20">Admin</span>
-      </div>
-    </aside>
-  );
-}
-
 // ── MAIN DASHBOARD ──────────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) router.push("/login");
+    if (!token) router.push("/Login");
   }, [router]);
 
   // Mock data
   const kpis = [
-    { icon: "👥", label: "Total Members", value: 1248, trend: 8.3, sparkData: [900, 950, 980, 1020, 1080, 1150, 1248], accent: "from-blue-500 to-indigo-600" },
-    { icon: "✅", label: "Active Memberships", value: 1034, trend: 5.1, sparkData: [800, 840, 870, 910, 950, 990, 1034], accent: "from-emerald-500 to-teal-600" },
-    { icon: "🚪", label: "Today's Check-ins", value: 87, trend: 12.4, sparkData: [55, 70, 62, 80, 75, 90, 87], accent: "from-violet-500 to-purple-600" },
-    { icon: "💰", label: "Monthly Revenue", value: 284500, prefix: "Rs ", trend: 15.2, sparkData: [190000, 210000, 225000, 240000, 258000, 270000, 284500], accent: "from-red-500 to-orange-500" },
-    { icon: "🏋️", label: "Trainers Count", value: 14, trend: -2.1, sparkData: [12, 13, 14, 13, 14, 14, 14], accent: "from-amber-500 to-yellow-500" },
-    { icon: "🆕", label: "New Registrations", value: 63, trend: 18.7, sparkData: [30, 38, 42, 50, 55, 60, 63], accent: "from-pink-500 to-rose-600" },
+    { icon: "👥", label: "Total Members", value: 0, trend: 0, sparkData: [], accent: "from-blue-500 to-indigo-600" },
+    { icon: "✅", label: "Active Memberships", value: 0, trend: 0, sparkData: [], accent: "from-emerald-500 to-teal-600" },
+    { icon: "🚪", label: "Today's Check-ins", value: 0, trend: 0, sparkData: [], accent: "from-violet-500 to-purple-600" },
+    { icon: "💰", label: "Monthly Revenue", value: 0, prefix: "Rs ", trend: 0, sparkData: [], accent: "from-red-500 to-orange-500" },
+    { icon: "🏋️", label: "Trainers Count", value: 0, trend: 0, sparkData: [], accent: "from-amber-500 to-yellow-500" },
+    { icon: "🆕", label: "New Registrations", value: 0, trend: 0, sparkData: [], accent: "from-pink-500 to-rose-600" },
   ];
 
-  const revenueData = [195, 212, 230, 245, 258, 270, 284];
-  const revenueLabels = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
+  const revenueData = [];
+  const revenueLabels = [];
 
-  const checkInData = [42, 68, 75, 55, 90, 83, 87];
-  const checkInLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const checkInData = [];
+  const checkInLabels = [];
 
   const membershipSegments = [
-    { label: "Basic", value: 520, color: "#6366f1" },
-    { label: "Pro", value: 514, color: "#ef4444" },
-    { label: "Inactive", value: 214, color: "#3f3f46" },
+    { label: "Basic", value: 0, color: "#6366f1" },
+    { label: "Pro", value: 0, color: "#ef4444" },
+    { label: "Inactive", value: 0, color: "#3f3f46" },
   ];
 
-  const recentMembers = [
-    { name: "Ali Hassan", plan: "Pro", date: "Today", status: "active" },
-    { name: "Sara Khan", plan: "Basic", date: "Today", status: "active" },
-    { name: "Umar Farooq", plan: "Pro", date: "Yesterday", status: "active" },
-    { name: "Nida Malik", plan: "Basic", date: "18 May", status: "inactive" },
-    { name: "Bilal Ahmed", plan: "Pro", date: "17 May", status: "active" },
-  ];
+  const recentMembers = [];
 
-  const trainers = [
-    { name: "Coach Raza", specialty: "Strength", members: 28, capacity: 35 },
-    { name: "Ms. Ayesha", specialty: "Cardio", members: 22, capacity: 30 },
-    { name: "Coach Tariq", specialty: "CrossFit", members: 30, capacity: 35 },
-    { name: "Mr. Kamran", specialty: "Yoga", members: 18, capacity: 25 },
-  ];
+  const trainers = [];
 
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-PK", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
@@ -300,10 +256,16 @@ export default function DashboardPage() {
             <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
               <h3 className="font-bold text-white mb-1">Trainer Capacity</h3>
               <p className="text-xs text-zinc-500 mb-4">Members assigned vs max capacity</p>
-              {trainers.map((t, i) => (
-                <ProgressBar key={i} label={`${t.name} · ${t.specialty}`} value={t.members} max={t.capacity}
-                  color={["from-red-500 to-orange-500","from-violet-500 to-purple-500","from-blue-500 to-indigo-500","from-emerald-500 to-teal-500"][i % 4]} />
-              ))}
+              {trainers.length === 0 ? (
+                <div className="flex items-center justify-center py-8 text-zinc-500 text-sm">
+                  No trainers registered
+                </div>
+              ) : (
+                trainers.map((t, i) => (
+                  <ProgressBar key={i} label={`${t.name} · ${t.specialty}`} value={t.members} max={t.capacity}
+                    color={["from-red-500 to-orange-500","from-violet-500 to-purple-500","from-blue-500 to-indigo-500","from-emerald-500 to-teal-500"][i % 4]} />
+                ))
+              )}
             </div>
           </div>
 
@@ -312,10 +274,10 @@ export default function DashboardPage() {
             <h3 className="font-bold text-white mb-1">Monthly Goals Progress</h3>
             <p className="text-xs text-zinc-500 mb-5">Track KPI targets for May 2026</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10">
-              <ProgressBar label="New Registrations" value={63} max={100} color="from-pink-500 to-rose-500" />
-              <ProgressBar label="Active Memberships" value={1034} max={1200} color="from-emerald-500 to-teal-500" />
-              <ProgressBar label="Revenue Target (Rs k)" value={285} max={350} color="from-red-500 to-orange-500" />
-              <ProgressBar label="Check-in Rate (%)" value={83} max={100} color="from-violet-500 to-purple-500" />
+              <ProgressBar label="New Registrations" value={0} max={100} color="from-pink-500 to-rose-500" />
+              <ProgressBar label="Active Memberships" value={0} max={1200} color="from-emerald-500 to-teal-500" />
+              <ProgressBar label="Revenue Target (Rs k)" value={0} max={350} color="from-red-500 to-orange-500" />
+              <ProgressBar label="Check-in Rate (%)" value={0} max={100} color="from-violet-500 to-purple-500" />
             </div>
           </div>
 
@@ -341,30 +303,38 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentMembers.map((m, i) => (
-                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/40 transition-colors">
-                      <td className="px-5 py-3 font-medium text-white flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                          {m.name.split(" ").map(n => n[0]).join("")}
-                        </div>
-                        {m.name}
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border
-                          ${m.plan === "Pro" ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"}`}>
-                          {m.plan}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-zinc-400">{m.date}</td>
-                      <td className="px-5 py-3">
-                        <span className={`flex items-center gap-1.5 text-xs font-semibold
-                          ${m.status === "active" ? "text-emerald-400" : "text-zinc-500"}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${m.status === "active" ? "bg-emerald-400" : "bg-zinc-600"}`} />
-                          {m.status === "active" ? "Active" : "Inactive"}
-                        </span>
+                  {recentMembers.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="text-center py-8 text-zinc-500 text-sm">
+                        No recent registrations found
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    recentMembers.map((m, i) => (
+                      <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/40 transition-colors">
+                        <td className="px-5 py-3 font-medium text-white flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                            {m.name.split(" ").map(n => n[0]).join("")}
+                          </div>
+                          {m.name}
+                        </td>
+                        <td className="px-5 py-3">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border
+                            ${m.plan === "Pro" ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"}`}>
+                            {m.plan}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-zinc-400">{m.date}</td>
+                        <td className="px-5 py-3">
+                          <span className={`flex items-center gap-1.5 text-xs font-semibold
+                            ${m.status === "active" ? "text-emerald-400" : "text-zinc-500"}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${m.status === "active" ? "bg-emerald-400" : "bg-zinc-600"}`} />
+                            {m.status === "active" ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
