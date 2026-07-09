@@ -1,7 +1,6 @@
 import dbConnect from '../../../lib/mongodb';
 import CheckIn from '../../../models/CheckIn';
 import User from '../../../models/User';
-import Trainer from '../../../models/Trainer';
 import { authenticate, authorizeRoles } from '../../../utils/auth';
 
 export default async function handler(req, res) {
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
               checkInTime: { $gte: startOfToday, $lte: endOfToday }
             })
               .populate('user', '-password')
-              .populate('trainer')
+              .populate('trainer', '-password')
               .sort({ checkInTime: -1 });
 
             return res.status(200).json({ success: true, checkIns });
@@ -72,8 +71,8 @@ export default async function handler(req, res) {
               name = member.name;
               userRef = member._id;
             } else {
-              const trainer = await Trainer.findById(id);
-              if (!trainer) {
+              const trainer = await User.findById(id);
+              if (!trainer || trainer.role !== 'trainer') {
                 return res.status(404).json({ success: false, message: 'Trainer not found' });
               }
               name = trainer.name;
@@ -90,7 +89,7 @@ export default async function handler(req, res) {
 
             const populatedCheckIn = await CheckIn.findById(checkIn._id)
               .populate('user', '-password')
-              .populate('trainer');
+              .populate('trainer', '-password');
 
             return res.status(201).json({ success: true, message: 'Checked in successfully', checkIn: populatedCheckIn });
           } catch (error) {

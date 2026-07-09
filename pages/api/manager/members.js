@@ -4,6 +4,15 @@ import Plan from '../../../models/Plan';
 import Trainer from '../../../models/Trainer';
 import { authenticate, authorizeRoles } from '../../../utils/auth';
 
+function getSubscriptionState(member) {
+  const hasPlan = !!member.plan;
+  const expiresAt = member.membershipExpiresAt ? new Date(member.membershipExpiresAt) : null;
+  const isExpired = !!(expiresAt && expiresAt < new Date());
+  const isActive = hasPlan && member.membershipStatus === 'active' && !isExpired;
+
+  return { hasPlan, expiresAt, isExpired, isActive };
+}
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -20,7 +29,23 @@ export default async function handler(req, res) {
               .populate('assignedTrainer')
               .sort({ createdAt: -1 });
 
-            return res.status(200).json({ success: true, members });
+            const normalizedMembers = members.map((member) => {
+              const { hasPlan, expiresAt, isExpired, isActive } = getSubscriptionState(member);
+              return {
+                ...member.toObject(),
+                subscriptionStatus: !hasPlan ? 'none' : isExpired ? 'expired' : isActive ? 'active' : 'inactive',
+                subscriptionLabel: !hasPlan ? 'No Plan' : isExpired ? 'Expired' : 'Subscribed',
+                subscriptionExpiresAt: expiresAt,
+                subscriptionBadge: hasPlan
+                  ? {
+                      label: member.plan?.allowsTrainer ? 'Premium' : 'Standard',
+                      icon: member.plan?.allowsTrainer ? '👑' : '💳',
+                    }
+                  : null,
+              };
+            });
+
+            return res.status(200).json({ success: true, members: normalizedMembers });
           } catch (error) {
             console.error('Fetch members error:', error);
             return res.status(500).json({ success: false, message: 'Server error', error: error.message });
@@ -44,25 +69,18 @@ export default async function handler(req, res) {
                 member.plan = null;
                 member.assignedTrainer = null;
                 member.membershipExpiresAt = null;
+                member.membershipStatus = 'inactive';
               } else {
                 const plan = await Plan.findById(planId);
                 if (!plan) {
                   return res.status(404).json({ success: false, message: 'Plan not found' });
                 }
                 member.plan = planId;
+                member.membershipStatus = 'active';
 
-                // Calculate expiry date
+                // Subscriptions expire after 30 days and require resubscribe.
                 const now = new Date();
-                if (plan.duration === '1 Month') {
-                  now.setMonth(now.getMonth() + 1);
-                } else if (plan.duration === '3 Months') {
-                  now.setMonth(now.getMonth() + 3);
-                } else if (plan.duration === 'Yearly') {
-                  now.setFullYear(now.getFullYear() + 1);
-                } else {
-                  // Fallback duration: 30 days
-                  now.setDate(now.getDate() + 30);
-                }
+                now.setDate(now.getDate() + 30);
                 member.membershipExpiresAt = now;
               }
             }
@@ -94,7 +112,24 @@ export default async function handler(req, res) {
               .populate('plan')
               .populate('assignedTrainer');
 
-            return res.status(200).json({ success: true, message: 'Member updated successfully', member: updatedMember });
+            const { hasPlan, expiresAt, isExpired, isActive } = getSubscriptionState(updatedMember);
+
+            return res.status(200).json({
+              success: true,
+              message: 'Member updated successfully',
+              member: {
+                ...updatedMember.toObject(),
+                subscriptionStatus: !hasPlan ? 'none' : isExpired ? 'expired' : isActive ? 'active' : 'inactive',
+                subscriptionLabel: !hasPlan ? 'No Plan' : isExpired ? 'Expired' : 'Subscribed',
+                subscriptionExpiresAt: expiresAt,
+                subscriptionBadge: hasPlan
+                  ? {
+                      label: updatedMember.plan?.allowsTrainer ? 'Premium' : 'Standard',
+                      icon: updatedMember.plan?.allowsTrainer ? '👑' : '💳',
+                    }
+                  : null,
+              }
+            });
           } catch (error) {
             console.error('Update member error:', error);
             return res.status(500).json({ success: false, message: 'Server error', error: error.message });

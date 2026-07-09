@@ -2,7 +2,7 @@ import dbConnect from '../../../lib/mongodb';
 import User from '../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { sendMail } from '../../../utils/mailer';
+// import { sendMail } from '../../../utils/mailer';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,12 +26,12 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
     // Send login notification email
-    await sendMail({
-      to: user.email,
-      subject: 'Login Notification',
-      text: `Hello ${user.name}, you have successfully logged in.`,
-      html: `<p>Hello <b>${user.name}</b>, you have successfully logged in.</p>`
-    });
+    // await sendMail({
+    //   to: user.email,
+    //   subject: 'Login Notification',
+    //   text: `Hello ${user.name}, you have successfully logged in.`,
+    //   html: `<p>Hello <b>${user.name}</b>, you have successfully logged in.</p>`
+    // });
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return res.status(200).json({ success: true, user: { name: user.name, email: user.email, role: user.role }, token });
   } catch (error) {

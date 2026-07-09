@@ -70,32 +70,27 @@ export default function Gympage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-white font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 font-sans selection:bg-red-500 selection:text-white">
 
       {/* HEADER */}
       <header className="fixed top-0 w-full z-50 bg-gradient-to-b from-black/80 to-transparent p-6 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center gap-2 group justify-between">
 
-         <div className="flex items-center gap-2 group cursor-pointer">
-  <svg
-    className="w-8 h-8 text-red-600 group-hover:rotate-12 transition-transform duration-300"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 10h18M3 14h18M5 6v12m14-12v12"
-    />
-  </svg>
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6.5 6.5h1v11h-1zM16.5 6.5h1v11h-1z" fill="currentColor" stroke="none"/>
+                <rect x="4" y="8" width="3" height="8" rx="1" fill="currentColor" stroke="none"/>
+                <rect x="17" y="8" width="3" height="8" rx="1" fill="currentColor" stroke="none"/>
+                <line x1="7" y1="12" x2="17" y2="12" strokeWidth={2}/>
+              </svg>
+            </div>
 
-  <span className="text-2xl font-black uppercase">
-    Fit<span className="text-red-600">core</span>
-  </span>
-</div>
-          <nav className="md:flex gap-8 text-sm text-zinc-300">
+            <span className="text-2xl font-black uppercase">
+              Fit<span className="text-red-600">core</span>
+            </span>
+          </div>
+          <nav className="md:flex gap-8 text-sm text-neutral-300">
             <a href="#about" className="hover:text-red-500">About</a>
             <a href="#plans" className="hover:text-red-500">Plans</a>
             <a href="#join" className="hover:text-red-500">Join</a>
@@ -126,11 +121,11 @@ export default function Gympage() {
         ))}
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tight mb-6 drop-shadow-2xl">
-            Push Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-600 to-orange-500 drop-shadow-[0_0_25px_rgba(220,38,38,0.5)]">Limits</span>
+          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tight mb-6 drop-shadow-2xl ">
+            Push Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-600 to-orange-500">Limits</span>
           </h1>
 
-          <p className="text-lg md:text-2xl text-zinc-300 font-light tracking-wide max-w-2xl mx-auto">
+          <p className="text-lg md:text-2xl text-neutral-300 font-light tracking-wide max-w-2xl mx-auto">
             Build strength, endurance, and confidence in a sanctuary designed for your transformation.
           </p>
         </div>
@@ -146,7 +141,7 @@ export default function Gympage() {
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">
                 Forge Your Legacy
               </h2>
-              <p className="text-zinc-400 text-lg leading-relaxed">
+              <p className="text-neutral-400 text-lg leading-relaxed">
                 At Fitcore, we provide a sanctuary for transformation. Step into an environment engineered for peak performance and unlock your true potential.
               </p>
               <div className="mt-8 flex gap-3">
@@ -173,7 +168,7 @@ export default function Gympage() {
       {/* PLANS */}
       <section id="plans" className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/50 to-black pointer-events-none"></div>
-        
+
         {/* Decorative background blur */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-900/10 blur-[100px] rounded-full pointer-events-none"></div>
 
@@ -184,7 +179,7 @@ export default function Gympage() {
               <h2 className="text-4xl md:text-5xl font-black uppercase">
                 Membership <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Plans</span>
               </h2>
-              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">Select a plan that aligns with your goals and start your journey today.</p>
+              <p className="text-neutral-400 mt-4 max-w-xl mx-auto">Select a plan that aligns with your goals and start your journey today.</p>
             </div>
           </FadeInSection>
 
@@ -198,23 +193,29 @@ export default function Gympage() {
 
                 <div className={`relative p-[1px] rounded-2xl h-full flex flex-col transition-transform duration-300 hover:-translate-y-2 ${plan.featured ? "bg-gradient-to-br from-red-500 via-red-600 to-orange-500 shadow-[0_0_30px_rgba(220,38,38,0.2)]" : "bg-gradient-to-br from-zinc-700 to-zinc-900 hover:from-zinc-600 hover:to-zinc-800"}`}>
                   <div className={`p-8 rounded-2xl flex flex-col h-full bg-zinc-950/95 backdrop-blur-xl`}>
-                    
+
                     {plan.featured && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-red-500/30">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-500 to-orange-500 text-neutral-100 text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-red-500/30">
                         Most Popular
                       </div>
                     )}
 
-                    <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                    <h3 className="text-2xl font-bold text-neutral-100">{plan.name}</h3>
 
                     <div className="mb-6 mt-4 flex items-end">
                       <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">Rs {plan.price}</span>
-                      <span className="text-zinc-500 ml-2 mb-1">/mo</span>
+                      <span className="text-neutral-500 ml-2 mb-1">/mo</span>
                     </div>
 
-                    <p className="text-zinc-400 flex-grow leading-relaxed">{plan.desc}</p>
-                    
-                    <button className={`mt-8 w-full py-4 rounded-xl font-bold transition-all duration-300 flex justify-center items-center gap-2 ${plan.featured ? "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white shadow-lg shadow-red-500/25" : "bg-zinc-800 hover:bg-zinc-700 text-white"}`}>
+                    <p className="text-neutral-400 flex-grow leading-relaxed">{plan.desc}</p>
+
+                    <button
+                      onClick={() => router.push("/Login")}
+                      className={`mt-8 w-full py-4 rounded-xl font-bold transition-all duration-300 flex justify-center items-center gap-2 ${plan.featured
+                          ? "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-neutral-100 shadow-lg shadow-red-500/25"
+                          : "bg-zinc-800 hover:bg-zinc-700 text-neutral-100"
+                        }`}
+                    >
                       Select {plan.name}
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -239,12 +240,12 @@ export default function Gympage() {
             <h2 className="text-5xl md:text-7xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600">
               Ready to Transform?
             </h2>
-            <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-neutral-400 mb-10 max-w-2xl mx-auto">
               Join Fitcore today and take the first step towards a stronger, healthier you.
             </p>
 
             <button
-              className="group px-12 py-5 font-bold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(220,38,38,0.4)] bg-gradient-to-r from-red-600 via-orange-500 to-red-600 bg-[length:200%_auto] hover:bg-right text-white flex items-center justify-center mx-auto gap-3 text-xl"
+              className="group px-12 py-5 font-bold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(220,38,38,0.4)] bg-gradient-to-r from-red-600 via-orange-500 to-red-600 bg-[length:200%_auto] hover:bg-right text-neutral-100 flex items-center justify-center mx-auto gap-3 text-xl"
               onClick={() => router.push("/Login")}
             >
               <span>Get Started Now</span>
@@ -264,14 +265,14 @@ export default function Gympage() {
             <h3 className="text-xl font-black">
               Fit<span className="text-red-600">core</span>
             </h3>
-            <p className="text-zinc-500 text-sm">
+            <p className="text-neutral-500 text-sm">
               Build strength. Build discipline.
             </p>
           </div>
 
 
 
-          <div className="text-zinc-600 text-sm">
+          <div className="text-neutral-500 text-sm">
             © {new Date().getFullYear()} Fitcore
           </div>
 

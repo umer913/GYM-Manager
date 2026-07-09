@@ -9,30 +9,23 @@ export function AppProvider({ children }) {
   const [theme, setTheme] = useState("dark");
   const pathname = usePathname();
 
-  // Load saved theme preference on mount
+  // Load saved theme on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    applyTheme("dark");
   }, []);
 
-  // Sync class name on root html based on current path and selected theme
+  // Reset to dark on auth/other pages
   useEffect(() => {
-    const isDashboard = pathname && pathname.startsWith("/GymManagerDashboard");
-    if (isDashboard && theme === "light") {
-      document.documentElement.classList.add("light-theme");
-      document.documentElement.classList.remove("dark-theme");
-    } else {
-      document.documentElement.classList.remove("light-theme");
-      document.documentElement.classList.add("dark-theme");
-    }
-  }, [pathname, theme]);
+    applyTheme("dark");
+  }, [pathname]);
+
+  const applyTheme = (t) => {
+    const root = document.documentElement;
+    root.classList.add("dark");
+  };
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    // Single theme mode, locked to dark
   };
 
   return (

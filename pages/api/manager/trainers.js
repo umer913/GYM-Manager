@@ -1,5 +1,6 @@
 import dbConnect from '../../../lib/mongodb';
-import Trainer from '../../../models/Trainer';
+import User from '../../../models/User';
+import bcrypt from 'bcryptjs';
 import { authenticate, authorizeRoles } from '../../../utils/auth';
 
 export default async function handler(req, res) {
@@ -12,7 +13,8 @@ export default async function handler(req, res) {
       switch (method) {
         case 'GET':
           try {
-            const trainers = await Trainer.find({})
+            const trainers = await User.find({ role: 'trainer' })
+              .select('-password')
               .sort({ createdAt: -1 });
             return res.status(200).json({ success: true, trainers });
           } catch (error) {
@@ -22,16 +24,28 @@ export default async function handler(req, res) {
 
         case 'POST':
           try {
-            const { name, phone, specialty, timings } = req.body;
-            if (!name || !phone) {
-              return res.status(400).json({ success: false, message: 'Name and phone are required' });
+            const { name, email, password, phone, specialty, timings } = req.body;
+            const normalizedEmail = email?.toLowerCase();
+            if (!name || !normalizedEmail || !password || !phone) {
+              return res.status(400).json({ success: false, message: 'Name, email, password, and phone are required' });
             }
 
-            const trainer = await Trainer.create({
+            const existingUser = await User.findOne({ email: normalizedEmail });
+            if (existingUser) {
+              return res.status(409).json({ success: false, message: 'User already exists' });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const trainer = await User.create({
               name,
+              email: normalizedEmail,
+              password: hashedPassword,
               phone,
               specialty: specialty || 'General',
-              timings: timings || 'Morning (06:00 AM - 11:00 AM)'
+              timings: timings || 'Morning (06:00 AM - 11:00 AM)',
+              role: 'trainer',
+              isVerified: true
             });
 
             return res.status(201).json({ success: true, message: 'Trainer added successfully', trainer });
@@ -43,19 +57,27 @@ export default async function handler(req, res) {
         case 'PUT':
           try {
             const { id } = req.query;
-            const { name, phone, specialty, timings } = req.body;
+            const { name, email, password, phone, specialty, timings } = req.body;
 
             const trainerId = id || req.body._id;
             if (!trainerId) {
               return res.status(400).json({ success: false, message: 'Trainer ID is required' });
             }
 
-            const trainer = await Trainer.findById(trainerId);
+            const trainer = await User.findById(trainerId);
             if (!trainer) {
               return res.status(404).json({ success: false, message: 'Trainer not found' });
             }
 
+            if (trainer.role !== 'trainer') {
+              return res.status(400).json({ success: false, message: 'Selected user is not a trainer' });
+            }
+
             if (name) trainer.name = name;
+            if (email) trainer.email = email.toLowerCase();
+            if (password) {
+              trainer.password = await bcrypt.hash(password, 10);
+            }
             if (phone) trainer.phone = phone;
             if (specialty) trainer.specialty = specialty;
             if (timings) trainer.timings = timings;
@@ -76,12 +98,16 @@ export default async function handler(req, res) {
               return res.status(400).json({ success: false, message: 'Trainer ID is required' });
             }
 
-            const trainer = await Trainer.findById(trainerId);
+            const trainer = await User.findById(trainerId);
             if (!trainer) {
               return res.status(404).json({ success: false, message: 'Trainer not found' });
             }
 
-            await Trainer.findByIdAndDelete(trainerId);
+            if (trainer.role !== 'trainer') {
+              return res.status(400).json({ success: false, message: 'Selected user is not a trainer' });
+            }
+
+            await User.findByIdAndDelete(trainerId);
             return res.status(200).json({ success: true, message: 'Trainer deleted successfully' });
           } catch (error) {
             console.error('Delete trainer error:', error);

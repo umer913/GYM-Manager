@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
 
+function normalizeRole(role) {
+  return typeof role === 'string' ? role.toLowerCase() : role;
+}
+
 export function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -17,7 +21,10 @@ export function authenticate(req, res, next) {
 
 export function authorizeRoles(...roles) {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    const allowedRoles = roles.map(normalizeRole);
+    const userRole = normalizeRole(req.user.role);
+
+    if (!allowedRoles.includes(userRole)) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
     next();

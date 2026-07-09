@@ -44,6 +44,8 @@ export default function LoginPage() {
       // Role-based routing
       if (data.user.role === "Manager") {
         router.push("/GymManagerDashboard");
+      } else if (data.user.role === "trainer") {
+        router.push("/TrainerDashboard");
       } else {
         router.push("/MemberDashboard");
       }

@@ -18,16 +18,23 @@ export default async function handler(req, res) {
     if (user.isVerified) {
       return res.status(400).json({ success: false, message: 'User already verified' });
     }
-    if (user.otp !== otp || user.otpExpires < new Date()) {
-      // Delete unverified user record on failed OTP
-      await User.deleteOne({ _id: user._id, isVerified: false });
-      return res.status(400).json({ success: false, message: 'Invalid or expired OTP. Account removed — please sign up again.' });
+
+    // OTP verification disabled. Keep the original check commented out.
+    // if (user.otp !== otp || user.otpExpires < new Date()) {
+    //   // Delete unverified user record on failed OTP
+    //   await User.deleteOne({ _id: user._id, isVerified: false });
+    //   return res.status(400).json({ success: false, message: 'Invalid or expired OTP. Account removed — please sign up again.' });
+    // }
+
+    if (otp !== '0000') {
+      return res.status(400).json({ success: false, message: 'Use 0000 to continue without OTP verification.' });
     }
+
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    // user.otp = undefined;
+    // user.otpExpires = undefined;
     await user.save();
-    return res.status(200).json({ success: true, message: 'Email verified successfully' });
+    return res.status(200).json({ success: true, message: 'OTP bypass accepted. You can log in now.' });
   } catch (error) {
     console.error('OTP verification error:', error);
     return res.status(500).json({ success: false, message: 'Server error', error: error.message });

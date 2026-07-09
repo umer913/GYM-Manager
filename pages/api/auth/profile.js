@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
       case 'PUT':
         try {
-          const { name, email, phone, currentPassword, newPassword } = req.body;
+          const { name, email, phone, specialty, timings, currentPassword, newPassword } = req.body;
           const user = await User.findById(userId);
           if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -43,6 +43,9 @@ export default async function handler(req, res) {
           // Profile fields update
           if (name) user.name = name;
           if (phone) user.phone = phone;
+          // Trainer-only fields
+          if (specialty && user.role === 'trainer') user.specialty = specialty;
+          if (timings   && user.role === 'trainer') user.timings   = timings;
 
           // Password change check
           if (newPassword) {
@@ -65,6 +68,8 @@ export default async function handler(req, res) {
             email: user.email,
             phone: user.phone,
             role: user.role,
+            specialty: user.specialty,
+            timings: user.timings,
             createdAt: user.createdAt
           };
 

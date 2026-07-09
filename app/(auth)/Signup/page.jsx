@@ -2,17 +2,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
+import Card from "../../../components/Card";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ email: "", Name: "", password: "", phone: "", role: "member" });
+  const router = useRouter();
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
   const [loading, setLoading] = useState(false);
-const router = useRouter();
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    
     e.preventDefault();
     setLoading(true);
     try {
@@ -20,22 +21,20 @@ const router = useRouter();
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.Name,
+          name: form.name,
           email: form.email,
           password: form.password,
           phone: form.phone || "0000000000",
-          role: form.role || "member"
-        })
+        }),
       });
       const data = await res.json();
       if (res.ok) {
-        alert(data.message || "Signup successful! Please check your email for OTP.");
-        setForm({ email: "", Name: "", password: "", phone: "", role: "member" });
-         router.push("/verify-otp");
+        alert(data.message || "Signup successful!");
+        router.push("/Login");
       } else {
         alert(data.message || "Signup failed");
       }
-    } catch (err) {
+    } catch {
       alert("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -43,76 +42,35 @@ const router = useRouter();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-      <div className="w-full max-w-md bg-zinc-900 rounded-2xl shadow-2xl p-10 border border-zinc-800">
-        <h2 className="text-3xl font-black text-white mb-8 text-center tracking-tight">
-          Create your <span className="text-red-600">Fitcore</span> account
-        </h2>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-zinc-300 font-semibold mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-              placeholder="Enter your email"
-            />
+    <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(239,68,68,0.12),_transparent_35%),linear-gradient(180deg,_#09090b_0%,_#111111_100%)] px-4 py-10">
+      <Card className="relative overflow-hidden border-zinc-800/80 bg-zinc-950/95">
+        <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-gradient-to-br from-red-600/20 to-orange-500/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="text-center mb-8">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-red-400/80 font-bold">Fitcore Access</p>
+            <h2 className="text-3xl font-black text-white mt-3 tracking-tight">
+              Create your <span className="text-red-500">Fitcore</span> account
+            </h2>
+            <p className="text-sm text-zinc-500 mt-3 max-w-sm mx-auto">Join Fitcore and start your fitness journey today.</p>
           </div>
-          <div>
-            <label htmlFor="Name" className="block text-zinc-300 font-semibold mb-2">
-              Name
-            </label>
-            <input
-              id="Name"
-              name="Name"
-              type="text"
-              autoComplete="name"
-              required
-              value={form.Name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-              placeholder="Enter your name"
-            />
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <Input name="name" type="text" value={form.name} onChange={handleChange} placeholder="Full name" required />
+            <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email" required />
+            <Input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" required />
+            <Input name="phone" type="text" value={form.phone} onChange={handleChange} placeholder="Phone" required />
+
+            <Button type="submit" disabled={loading} className="mt-2">
+              {loading ? "Signing Up..." : "Sign Up"}
+            </Button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <span className="text-zinc-400">Already have an account?</span>{" "}
+            <Link href="/Login" className="text-red-500 hover:underline font-semibold">Log in</Link>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-zinc-300 font-semibold mb-2">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={form.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-              placeholder="Create a password"
-            />
-          </div>
-          {/* Optionally add phone and role fields here */}
-          <button
-            type="submit"
-            className="w-full py-3 mt-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg shadow-md"
-            disabled={loading}
-          >
-            {loading ? "Signing Up..." : "Sign Up"}
-          </button>
-        </form>
-        <div className="mt-8 text-center">
-          <span className="text-zinc-400">Already have an account?</span>{' '}
-          <Link href="/Login" className="text-red-500 hover:underline font-semibold">
-            Log in
-          </Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
