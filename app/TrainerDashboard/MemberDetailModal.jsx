@@ -28,9 +28,9 @@ function TabBtn({ label, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
+      className={`px-4 py-2 text-sm font-black uppercase tracking-tight rounded-lg transition-all cursor-pointer ${
         active
-          ? "bg-violet-600/20 text-white border border-violet-500/30"
+          ? "bg-red-500/10 text-white border border-red-500/30"
           : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
       }`}
     >
@@ -174,7 +174,7 @@ function WeeklyPlanTab({ memberId, weeklyPlan, setWeeklyPlan, saving, onSave }) 
       <button
         onClick={onSave}
         disabled={saving}
-        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 cursor-pointer"
+        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-sm shadow-lg shadow-red-500/20 transition disabled:opacity-50 cursor-pointer"
       >
         {saving ? "Saving…" : "Save Weekly Plan"}
       </button>
@@ -281,7 +281,7 @@ function DietPlanTab({ dietPlan, setDietPlan, saving, onSave }) {
       <button
         onClick={onSave}
         disabled={saving}
-        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 cursor-pointer"
+        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-sm shadow-lg shadow-red-500/20 transition disabled:opacity-50 cursor-pointer"
       >
         {saving ? "Saving…" : "Save Diet Plan"}
       </button>
@@ -449,7 +449,7 @@ export default function MemberDetailModal({ member, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center font-bold text-sm">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-black text-sm text-white shadow-md shadow-red-500/20">
               {initials}
             </div>
             <div>

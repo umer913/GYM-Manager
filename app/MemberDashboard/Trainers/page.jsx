@@ -81,9 +81,9 @@ export default function MemberTrainersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 flex flex-col justify-center items-center">
-        <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-zinc-400">Loading trainers...</p>
+      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 flex flex-col justify-center items-center gap-4">
+        <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-zinc-500 tracking-widest uppercase">Loading trainers…</p>
       </div>
     );
   }
@@ -114,33 +114,40 @@ export default function MemberTrainersPage() {
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 font-sans selection:bg-red-500 selection:text-white">
       <Sidebar active="Trainers" member={member} />
 
-      <div className="lg:ml-60 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900 px-6 py-4 flex items-center justify-between">
+      <div className="lg:ml-60 flex flex-col min-h-screen pt-14 lg:pt-0">
+        <header className="sticky top-0 z-20 bg-gradient-to-b from-black/80 to-transparent backdrop-blur-md border-b border-zinc-900/60 px-5 sm:px-8 py-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-red-400 font-semibold">Member Portal</p>
-            <h1 className="text-xl font-bold mt-1 text-white">Trainers</h1>
-            <p className="text-xs text-zinc-500">{dateStr}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500">Member Portal</p>
+            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white mt-0.5 leading-none">Trainers</h1>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-red-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-black text-sm text-white shadow-lg shadow-red-500/20">
             {initials}
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-6 space-y-6">
-          <section className="rounded-3xl border border-zinc-800 bg-[radial-gradient(circle_at_top_right,_rgba(239,68,68,0.12),_transparent_40%),linear-gradient(135deg,_rgba(24,24,27,0.98),_rgba(9,9,11,0.98))] p-6 md:p-8">
-            <div className="grid gap-6 md:grid-cols-[1.4fr_0.8fr] items-start">
+        <main className="flex-1 px-5 sm:px-8 py-6 space-y-6 max-w-6xl mx-auto w-full">
+          {/* Hero Banner */}
+          <section className="relative rounded-2xl overflow-hidden border border-zinc-800/80 shadow-[0_0_40px_rgba(220,38,38,0.08)] p-6 md:p-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-red-600/10 blur-[80px] rounded-full pointer-events-none" />
+            <div className="relative grid gap-6 md:grid-cols-[1.4fr_0.8fr] items-start">
               <div>
-                <p className="text-sm text-zinc-400">{quote}</p>
-                <h2 className="mt-2 text-3xl md:text-4xl font-black tracking-tight text-white">Pick a trainer that matches your goal.</h2>
-                <p className="mt-3 text-zinc-400 max-w-2xl">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500 mb-2">{quote}</p>
+                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">Pick a trainer that matches your goal.</h2>
+                <div className="flex items-center gap-2 mt-3">
+                  <div className="h-0.5 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+                  <div className="h-0.5 w-4 bg-gradient-to-r from-red-500 to-orange-500 rounded-full opacity-60" />
+                  <div className="h-0.5 w-2 bg-gradient-to-r from-red-500 to-orange-500 rounded-full opacity-30" />
+                </div>
+                <p className="mt-3 text-zinc-400 max-w-2xl text-sm">
                   {canChooseTrainer
-                    ? "Your active plan allows trainer selection. You can pick one trainer from the list below."
-                    : "Trainer selection is locked until you subscribe to a plan created by the admin that includes trainer access."}
+                    ? "Your active plan allows trainer selection. Pick one trainer from the list below."
+                    : "Trainer selection is locked until you subscribe to a plan that includes trainer access."}
                 </p>
               </div>
-              <div className="rounded-2xl border border-zinc-850 bg-zinc-950/70 p-5">
-                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-bold">Current Plan</p>
-                <p className="mt-3 text-lg font-bold text-white">{member.plan ? member.plan.name : "No active plan"}</p>
+              <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950/70 p-5">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Current Plan</p>
+                <p className="mt-3 text-lg font-black text-white uppercase tracking-tight">{member.plan ? member.plan.name : "No active plan"}</p>
                 <p className="mt-2 text-sm text-zinc-400">{member.plan ? `${member.plan.duration} · Rs ${member.plan.price?.toLocaleString?.() || member.plan.price}` : "Subscribe to unlock trainer selection."}</p>
                 <div className={`mt-4 inline-flex text-xs px-3 py-1 rounded-full border font-semibold ${canChooseTrainer ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-zinc-400 bg-zinc-800 border-zinc-700"}`}>
                   {canChooseTrainer ? "Trainer access enabled" : "Trainer access disabled"}
@@ -152,17 +159,21 @@ export default function MemberTrainersPage() {
           <section className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5 space-y-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
-                <h3 className="font-bold text-white">Available Trainers</h3>
-                <p className="text-xs text-zinc-550">Search and choose from the trainers added by the admin.</p>
+                <h3 className="font-black text-white uppercase tracking-tight text-sm">Available Trainers</h3>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div className="h-0.5 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+                  <div className="h-0.5 w-6 bg-zinc-700/60 rounded-full" />
+                </div>
+                <p className="text-xs text-zinc-500 mt-1">Search and choose from trainers added by the admin.</p>
               </div>
               <div className="relative w-full md:w-80">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">🔍</span>
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35"/></svg>
                 <input
                   type="text"
                   placeholder="Search trainers..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-zinc-950/50 text-white placeholder-zinc-500 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                  className="w-full pl-9 pr-4 bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition"
                 />
               </div>
             </div>
@@ -204,11 +215,11 @@ export default function MemberTrainersPage() {
                     <button
                       disabled={!canChooseTrainer || assigningTrainerId === trainer.id || isCurrent}
                       onClick={() => handleAssignTrainer(trainer.id)}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold border transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`px-4 py-2 rounded-xl text-xs font-black border transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
                         isCurrent
                           ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                           : canChooseTrainer
-                            ? "bg-gradient-to-r from-red-600/10 to-orange-600/10 text-orange-400 border border-orange-500/20 hover:from-red-600/20 hover:to-orange-600/20"
+                            ? "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white border-transparent shadow-md shadow-red-500/20"
                             : "bg-zinc-800 text-zinc-500 border-zinc-700"
                       }`}
                     >
@@ -220,6 +231,10 @@ export default function MemberTrainersPage() {
             </div>
           </section>
         </main>
+
+        <footer className="border-t border-zinc-900 px-6 py-5 text-center text-xs text-zinc-600 mt-auto">
+          © {new Date().getFullYear()} Fitcore — Member Portal
+        </footer>
       </div>
     </div>
   );

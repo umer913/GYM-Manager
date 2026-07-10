@@ -104,9 +104,9 @@ export default function AttendancePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-white flex flex-col justify-center items-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 flex flex-col justify-center items-center">
         <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-zinc-400">Loading attendance data...</p>
+        <p className="text-xs text-zinc-500 tracking-widest uppercase">Loading attendance...</p>
       </div>
     );
   }
@@ -130,18 +130,19 @@ export default function AttendancePage() {
       <Script src="https://unpkg.com/html5-qrcode" strategy="lazyOnload" />
       <Sidebar active="Attendance" member={member} />
 
-      <div className="lg:ml-60 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900 px-6 py-4 flex items-center justify-between">
+      <div className="lg:ml-60 flex flex-col min-h-screen pt-14 lg:pt-0">
+        {/* Header */}
+        <header className="sticky top-0 z-20 bg-gradient-to-b from-black/80 to-transparent backdrop-blur-md border-b border-zinc-900/60 px-5 sm:px-8 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-white">My Attendance</h1>
-            <p className="text-xs text-zinc-500">Record check-ins and track monthly attendance</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500">Member Portal</p>
+            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white mt-0.5 leading-none">Attendance</h1>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-red-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-black text-sm text-white shadow-lg shadow-red-500/20">
             {initials}
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-6 space-y-6 max-w-5xl">
+        <main className="flex-1 px-5 sm:px-8 py-6 space-y-6 max-w-5xl mx-auto w-full">
           {error && (
             <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm">⚠️ {error}</div>
           )}
@@ -149,11 +150,17 @@ export default function AttendancePage() {
             <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-sm">📍 {locError}</div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {/* Calendar */}
-            <div className="md:col-span-2 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
+            <div className="md:col-span-2 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700 p-5 transition">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg text-white">Attendance Log</h3>
+                <div>
+                  <h3 className="font-black text-white uppercase tracking-tight text-sm">Attendance Log</h3>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="h-0.5 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+                    <div className="h-0.5 w-6 bg-zinc-700/60 rounded-full" />
+                  </div>
+                </div>
                 <span className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full font-semibold">{monthName}</span>
               </div>
               {/* Weekday headers */}
@@ -178,7 +185,7 @@ export default function AttendancePage() {
                 })}
               </div>
               {/* Legend */}
-              <div className="mt-6 pt-4 border-t border-zinc-850 flex items-center justify-between text-xs text-zinc-550">
+              <div className="mt-6 pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500">
                 <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-emerald-500/20 border border-emerald-500/30" />Checked In</div>
                 <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-zinc-950/40 border border-zinc-900" />Absent</div>
                 <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-zinc-800 border border-red-500/50" />Today</div>
@@ -186,15 +193,19 @@ export default function AttendancePage() {
             </div>
 
             {/* Check-in Panel */}
-            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5 flex flex-col min-h-[350px]">
-              <h3 className="font-bold text-lg mb-1 text-white">Today's Session</h3>
+            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700 p-5 flex flex-col min-h-[350px] transition">
+              <h3 className="font-black text-white uppercase tracking-tight text-sm mb-1">Today's Session</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-0.5 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+                <div className="h-0.5 w-6 bg-zinc-700/60 rounded-full" />
+              </div>
               <p className="text-xs text-zinc-500 mb-5">Mark your attendance in the gym</p>
 
               {isCheckedInToday ? (
                 <div className="text-center py-10 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4">
                   <span className="text-4xl block mb-2">✅</span>
                   <h4 className="font-bold text-sm text-white">Attendance Confirmed</h4>
-                  <p className="text-xs text-zinc-450 mt-1">Already checked in for today. Keep pushing! 🏋️</p>
+                  <p className="text-xs text-zinc-500 mt-1">Already checked in for today. Keep pushing! 🏋️</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -209,13 +220,13 @@ export default function AttendancePage() {
                   )}
 
                   {!scanning && (
-                    <div className="text-center py-6 bg-zinc-950/50 rounded-2xl border border-zinc-850 p-4 space-y-4">
+                    <div className="text-center py-6 bg-zinc-950/50 rounded-2xl border border-zinc-800/60 p-4 space-y-4">
                       <span className="text-4xl block">📅</span>
                       <div>
                         <p className="text-sm font-semibold text-white">Scan Session QR Code</p>
                         <p className="text-xs text-zinc-500 mt-1">Open camera to scan the check-in QR code inside the gym.</p>
                         {coords && (
-                          <div className="text-[10px] text-zinc-500 bg-zinc-950 border border-zinc-850 p-2 rounded leading-relaxed mt-2.5 max-w-xs mx-auto">
+                          <div className="text-[10px] text-zinc-500 bg-zinc-950 border border-zinc-800/60 p-2 rounded leading-relaxed mt-2.5 max-w-xs mx-auto">
                             📍 <b>My Location:</b><br />
                             <span className="text-zinc-400">{readableAddr || "Resolving address..."}</span>
                           </div>
@@ -252,6 +263,10 @@ export default function AttendancePage() {
             </div>
           </div>
         </main>
+
+        <footer className="border-t border-zinc-900 px-6 py-5 text-center text-xs text-zinc-600 mt-auto">
+          © {new Date().getFullYear()} Fitcore — Member Portal
+        </footer>
       </div>
     </div>
   );

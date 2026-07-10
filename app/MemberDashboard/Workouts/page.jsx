@@ -57,7 +57,7 @@ function TrainerWorkoutPlan({ weeklyWorkoutPlan, trainer, planUpdatedAt }) {
 
   return (
     <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 overflow-hidden">
-      <div className="px-5 py-4 border-b border-zinc-850 flex flex-wrap items-center justify-between gap-2">
+      <div className="px-5 py-4  border-zinc-850 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="font-bold text-white">Weekly Workout Plan</h3>
           {trainer && (
@@ -68,14 +68,14 @@ function TrainerWorkoutPlan({ weeklyWorkoutPlan, trainer, planUpdatedAt }) {
           )}
         </div>
         {planUpdatedAt && (
-          <span className="text-xs text-zinc-500 bg-zinc-950 border border-zinc-850 px-3 py-1 rounded-full">
+          <span className="text-xs text-zinc-500 bg-zinc-950  border-zinc-850 px-3 py-1 rounded-full">
             Updated {new Date(planUpdatedAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}
           </span>
         )}
       </div>
 
       {/* Day tabs */}
-      <div className="flex overflow-x-auto gap-2 px-5 py-3 border-b border-zinc-850 no-scrollbar">
+      <div className="flex overflow-x-auto gap-2 px-5 py-3  border-zinc-850 no-scrollbar">
         {weeklyWorkoutPlan.map((d, i) => (
           <button
             key={d.day}
@@ -116,7 +116,7 @@ function TrainerWorkoutPlan({ weeklyWorkoutPlan, trainer, planUpdatedAt }) {
         ) : (
           <div className="space-y-3">
             {day.exercises.map((ex, i) => (
-              <div key={i} className="flex items-start gap-4 p-3 rounded-xl bg-zinc-950/40 border border-zinc-850">
+              <div key={i} className="flex items-start gap-4 p-3 rounded-xl ">
                 <div className="w-7 h-7 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center text-xs font-bold shrink-0">
                   {i + 1}
                 </div>
@@ -156,7 +156,7 @@ function TrainerDietPlan({ weeklyDietPlan, trainer }) {
 
   return (
     <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 overflow-hidden">
-      <div className="px-5 py-4 border-b border-zinc-850">
+      <div className="px-5 py-4 border-zinc-850">
         <h3 className="font-bold text-white">Weekly Diet Plan</h3>
         {trainer && <p className="text-xs text-zinc-500 mt-0.5">Set by <span className="text-orange-400">{trainer.name}</span></p>}
       </div>
@@ -181,7 +181,7 @@ function TrainerDietPlan({ weeklyDietPlan, trainer }) {
             <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Meal Schedule</p>
             <div className="space-y-2">
               {weeklyDietPlan.meals.map((meal, i) => (
-                <div key={i} className="flex items-start gap-4 p-3 rounded-xl bg-zinc-950/40 border border-zinc-850">
+                <div key={i} className="flex items-start gap-4 p-3 rounded-xl ">
                   <div className="shrink-0 min-w-[72px]">
                     <span className="text-xs font-bold text-red-400">{meal.time || `Meal ${i + 1}`}</span>
                   </div>
@@ -541,9 +541,9 @@ export default function MyWorkoutsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 flex flex-col justify-center items-center">
-        <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-zinc-400">Loading your workouts...</p>
+      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 flex flex-col justify-center items-center gap-4">
+        <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-zinc-500 tracking-widest uppercase">Loading workouts…</p>
       </div>
     );
   }
@@ -566,20 +566,19 @@ export default function MyWorkoutsPage() {
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 font-sans selection:bg-red-500 selection:text-white">
       <Sidebar active="My Workouts" member={member} />
 
-      <div className="lg:ml-60 flex flex-col min-h-screen">
+      <div className="lg:ml-60 flex flex-col min-h-screen pt-14 lg:pt-0">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900 px-6 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-gradient-to-b from-black/80 to-transparent backdrop-blur-md border-b border-zinc-900/60 px-5 sm:px-8 py-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-red-450 font-semibold">Member Portal</p>
-            <h1 className="text-xl font-bold mt-1 text-white">My Workouts</h1>
-            <p className="text-xs text-zinc-500">Your trainer plan & AI recommendations</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500">Member Portal</p>
+            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white mt-0.5 leading-none">My Workouts</h1>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-red-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-black text-sm text-white shadow-lg shadow-red-500/20">
             {initials}
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-6 space-y-6">
+        <main className="flex-1 px-5 sm:px-8 py-6 space-y-6 max-w-6xl mx-auto w-full">
           {/* Trainer info banner */}
           {trainer ? (
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-red-500/5 border border-red-500/20 shadow-sm">
@@ -603,22 +602,26 @@ export default function MyWorkoutsPage() {
           )}
 
           {/* Section Toggle */}
-          <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-zinc-850 rounded-xl w-fit">
+          <div className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-800/80 rounded-xl w-fit">
             <button
               onClick={() => setActiveSection("trainer")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer ${
-                activeSection === "trainer" ? "bg-red-600 text-white shadow-md shadow-red-655/15" : "text-zinc-400 hover:text-white"
+              className={`px-4 py-2 rounded-lg text-sm font-black uppercase tracking-tight transition cursor-pointer ${
+                activeSection === "trainer"
+                  ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md shadow-red-500/20"
+                  : "text-zinc-500 hover:text-white"
               }`}
             >
-              🏋️ Trainer Plan
+              Trainer Plan
             </button>
             <button
               onClick={() => setActiveSection("ai")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer ${
-                activeSection === "ai" ? "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white shadow-lg shadow-red-500/20" : "text-zinc-400 hover:text-white"
+              className={`px-4 py-2 rounded-lg text-sm font-black uppercase tracking-tight transition cursor-pointer ${
+                activeSection === "ai"
+                  ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md shadow-red-500/20"
+                  : "text-zinc-500 hover:text-white"
               }`}
             >
-              🤖 AI Recommendations
+              AI Recommendations
             </button>
           </div>
 
@@ -636,7 +639,7 @@ export default function MyWorkoutsPage() {
           )}
         </main>
 
-        <footer className="border-t border-zinc-900 px-6 py-4 text-center text-xs text-zinc-650 mt-auto">
+        <footer className="border-t border-zinc-900 px-6 py-5 text-center text-xs text-zinc-600 mt-auto">
           © {new Date().getFullYear()} Fitcore — Member Portal
         </footer>
       </div>
