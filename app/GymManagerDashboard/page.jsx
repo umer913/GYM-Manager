@@ -3,11 +3,40 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
-import KpiCard from "../../components/KpiCard";
 import BarChart from "../../components/BarChart";
 import DonutChart from "../../components/DonutChart";
 import ProgressBar from "../../components/ProgressBar";
 import { apiCall } from "../../utils/api";
+
+// ── StatCard ─────────────────────────────────────────────────────────
+function StatCard({ label, value, sub, accent = "from-red-500 to-orange-500", bigLabel, delay = 0 }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  return (
+    <div
+      className={`relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-700 group transition-all duration-700 p-6
+        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
+      style={{ transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms, border-color 0.3s` }}
+    >
+      <span className="absolute -bottom-3 -right-2 text-7xl font-black uppercase tracking-tighter text-white/[0.04] select-none pointer-events-none leading-none">
+        {bigLabel}
+      </span>
+      <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${accent}`} />
+      <div className={`absolute -top-8 -right-8 w-28 h-28 rounded-full bg-gradient-to-br ${accent} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500`} />
+      <div className="relative z-10">
+        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 mb-3">{label}</p>
+        <p className={`text-4xl font-black leading-none text-transparent bg-clip-text bg-gradient-to-r ${accent}`}>
+          {value}
+        </p>
+        {sub && <p className="text-xs text-zinc-500 mt-2 leading-snug">{sub}</p>}
+      </div>
+    </div>
+  );
+}
 
 // ── QR Code Modal ────────────────────────────────────────────────────
 function QrCodeModal({ onClose }) {
@@ -31,20 +60,17 @@ function QrCodeModal({ onClose }) {
   useEffect(() => {
     fetchToken();
     setTimeLeft(30);
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) { fetchToken(); return 30; }
         return prev - 1;
       });
     }, 1000);
-
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) =>
         setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude })
       );
     }
-
     return () => clearInterval(timer);
   }, []);
 
@@ -207,7 +233,6 @@ export default function DashboardPage() {
       status: m.membershipStatus || "active",
     })));
 
-    // Build donut segments from plan groups
     const planGroups = {};
     membersList.filter(m => m.membershipStatus !== "inactive").forEach(m => {
       const name = m.plan?.name || "No Plan";
@@ -225,7 +250,6 @@ export default function DashboardPage() {
       { label: "Inactive", value: 0, color: "#3f3f46" },
     ]);
 
-    // Trainer capacity
     const trainerMemberCount = {};
     membersList.forEach(m => {
       if (m.assignedTrainer) {
@@ -235,8 +259,8 @@ export default function DashboardPage() {
     });
     setTrainers(trainersList.map(t => ({ name: t.name, specialty: t.specialty, members: trainerMemberCount[t._id] || 0, capacity: 15 })));
 
-    // Weekly check-in chart
-    const counts = [12, 19, 15, 22, 0, 0, 0];
+    // Weekly check-in chart — only today's slot is real, rest start at 0
+    const counts = [0, 0, 0, 0, 0, 0, 0];
     const dayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
     counts[dayIdx] = checkIns.length;
     setCheckInData(counts);
@@ -251,30 +275,32 @@ export default function DashboardPage() {
   }, [router]);
 
   const kpis = [
-    { icon: "👥", label: "Total Members",      value: stats.totalMembers,      trend: 12, accent: "from-blue-500 to-indigo-600",    sparkData: [40,45,55,60,68,72,stats.totalMembers] },
-    { icon: "✅", label: "Active Memberships", value: stats.activeMemberships, trend: 8,  accent: "from-emerald-500 to-teal-600",   sparkData: [35,42,48,52,58,62,stats.activeMemberships] },
-    { icon: "🚪", label: "Today's Check-ins",  value: stats.todayCheckIns,     trend: 24, accent: "from-violet-500 to-purple-600",  sparkData: [15,18,12,25,20,28,stats.todayCheckIns] },
-    { icon: "💰", label: "Monthly Revenue",    value: stats.monthlyRevenue,    trend: 15, prefix: "Rs ", accent: "from-red-500 to-orange-500", sparkData: [120,140,165,180,210,240,stats.monthlyRevenue/1000] },
-    { icon: "🏋️", label: "Trainers Count",     value: stats.trainersCount,     trend: 5,  accent: "from-amber-500 to-yellow-500",   sparkData: [3,4,4,5,5,6,stats.trainersCount] },
-    { icon: "🆕", label: "New Registrations",  value: stats.newRegistrations,  trend: 18, accent: "from-pink-500 to-rose-600",      sparkData: [5,8,12,10,15,18,stats.newRegistrations] },
+    { label: "Total Members",      value: stats.totalMembers,      sub: "Registered in the system", accent: "from-blue-500 to-indigo-600",    bigLabel: "MEMBERS" },
+    { label: "Active Memberships", value: stats.activeMemberships, sub: "With active plan",          accent: "from-emerald-500 to-teal-600",   bigLabel: "ACTIVE" },
+    { label: "Today's Check-ins",  value: stats.todayCheckIns,     sub: "Attendance today",          accent: "from-violet-500 to-purple-600",  bigLabel: "CHECK-INS" },
+    { label: "Monthly Revenue",    value: `Rs ${stats.monthlyRevenue.toLocaleString()}`, sub: "Active plan subscribers", accent: "from-red-500 to-orange-500", bigLabel: "REVENUE" },
+    { label: "Trainers Count",     value: stats.trainersCount,     sub: "Available trainers",        accent: "from-amber-500 to-yellow-500",   bigLabel: "TRAINERS" },
+    { label: "New Registrations",  value: stats.newRegistrations,  sub: "Last 30 days",              accent: "from-pink-500 to-rose-600",      bigLabel: "NEW" },
   ];
 
-  const REVENUE_DATA   = [120, 150, 180, 220, 260, 310, Math.round(stats.monthlyRevenue / 1000)];
-  const REVENUE_LABELS = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
+  const REVENUE_DATA   = [0, 0, 0, 0, 0, 0, Math.round(stats.monthlyRevenue / 1000)];
+  const REVENUE_LABELS = ["6mo ago", "5mo ago", "4mo ago", "3mo ago", "2mo ago", "Last mo", "This mo"];
   const CHECKIN_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const dateStr = new Date().toLocaleDateString("en-PK", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 font-sans selection:bg-red-500 selection:text-white">
       <Sidebar active="Dashboard" />
 
-      <div className="lg:ml-60 flex flex-col min-h-screen">
-        {/* Topbar */}
-        <header className="sticky top-0 z-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/60 px-6 py-4 flex items-center justify-between">
+      <div className="lg:ml-60 flex flex-col min-h-screen pt-14 lg:pt-0">
+
+        {/* Header */}
+        <header className="sticky top-0 z-20 bg-gradient-to-b from-black/80 to-transparent backdrop-blur-md border-b border-zinc-900/60 px-5 sm:px-8 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Gym Manager Dashboard</h1>
-            <p className="text-xs text-zinc-500">{dateStr}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500">Gym Manager Portal</p>
+            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white mt-0.5 leading-none">Dashboard</h1>
+            <p className="text-[11px] text-zinc-600 mt-0.5 hidden sm:block">{dateStr}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -283,46 +309,47 @@ export default function DashboardPage() {
             >
               📷 Attendance QR
             </button>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-bold text-sm">GM</div>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center font-black text-sm text-white shadow-lg shadow-red-500/20">GM</div>
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-6 space-y-8">
+        <main className="flex-1 px-4 sm:px-8 py-6 space-y-5 max-w-6xl w-full mx-auto">
+
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {kpis.map((k, i) => <KpiCard key={k.label} {...k} delay={i * 80} />)}
+            {kpis.map((k, i) => <StatCard key={k.label} {...k} delay={i * 80} />)}
           </div>
 
           {/* Charts row */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            <div className="xl:col-span-2 rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
+            <div className="xl:col-span-2 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-bold">Monthly Revenue</h3>
-                <span className="text-xs text-zinc-500 bg-zinc-800 px-3 py-1 rounded-full">Last 7 months</span>
+                <h3 className="font-black uppercase tracking-tight text-sm">Monthly Revenue</h3>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Last 7 months</span>
               </div>
-              <p className="text-xs text-zinc-500 mb-2">Revenue in thousands (Rs)</p>
+              <p className="text-[11px] text-zinc-500 mb-4">Revenue in thousands (Rs)</p>
               <BarChart data={REVENUE_DATA} labels={REVENUE_LABELS} color="#ef4444" />
             </div>
-            <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
-              <h3 className="font-bold mb-1">Membership Split</h3>
-              <p className="text-xs text-zinc-500 mb-4">Total across all plans</p>
+            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
+              <h3 className="font-black uppercase tracking-tight text-sm mb-1">Membership Split</h3>
+              <p className="text-[11px] text-zinc-500 mb-4">Total across all plans</p>
               <DonutChart segments={membershipSegments} />
             </div>
           </div>
 
           {/* Check-ins + Trainer Capacity */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
+            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-bold">Weekly Check-ins</h3>
-                <span className="text-xs text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">This Week</span>
+                <h3 className="font-black uppercase tracking-tight text-sm">Weekly Check-ins</h3>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">This Week</span>
               </div>
-              <p className="text-xs text-zinc-500 mb-2">Daily attendance count</p>
+              <p className="text-[11px] text-zinc-500 mb-4">Daily attendance count</p>
               <BarChart data={checkInData} labels={CHECKIN_LABELS} color="#8b5cf6" />
             </div>
-            <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
-              <h3 className="font-bold mb-1">Trainer Capacity</h3>
-              <p className="text-xs text-zinc-500 mb-4">Members assigned vs max capacity</p>
+            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
+              <h3 className="font-black uppercase tracking-tight text-sm mb-1">Trainer Capacity</h3>
+              <p className="text-[11px] text-zinc-500 mb-4">Members assigned vs max capacity</p>
               {trainers.length === 0 ? (
                 <div className="flex items-center justify-center py-8 text-zinc-500 text-sm">No trainers registered</div>
               ) : (
@@ -338,9 +365,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Monthly Goals */}
-          <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-5">
-            <h3 className="font-bold mb-1">Monthly Goals Progress</h3>
-            <p className="text-xs text-zinc-500 mb-5">Track KPI targets</p>
+          <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
+            <h3 className="font-black uppercase tracking-tight text-sm mb-1">Monthly Goals Progress</h3>
+            <p className="text-[11px] text-zinc-500 mb-5">Track KPI targets</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10">
               <ProgressBar label="New Registrations"    value={stats.newRegistrations}  max={100}  color="from-pink-500 to-rose-500" />
               <ProgressBar label="Active Memberships"   value={stats.activeMemberships} max={1200} color="from-emerald-500 to-teal-500" />
@@ -353,17 +380,17 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Registrations */}
-          <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 overflow-hidden">
-            <div className="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
+          <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 overflow-hidden">
+            <div className="px-5 py-4 border-b border-zinc-800/50 flex items-center justify-between">
               <div>
-                <h3 className="font-bold">Recent Registrations</h3>
-                <p className="text-xs text-zinc-500">Latest new members</p>
+                <h3 className="font-black uppercase tracking-tight text-sm">Recent Registrations</h3>
+                <p className="text-[11px] text-zinc-500">Latest new members</p>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-800 text-zinc-500 text-xs uppercase tracking-wider">
+                  <tr className="border-b border-zinc-800/50 text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
                     <th className="text-left px-5 py-3">Member</th>
                     <th className="text-left px-5 py-3">Plan</th>
                     <th className="text-left px-5 py-3">Joined</th>
@@ -375,22 +402,22 @@ export default function DashboardPage() {
                     <tr><td colSpan="4" className="text-center py-8 text-zinc-500 text-sm">No recent registrations</td></tr>
                   ) : (
                     recentMembers.map((m, i) => (
-                      <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/40 transition-colors">
-                        <td className="px-5 py-3 font-medium text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      <tr key={i} className="border-b border-zinc-800/30 hover:bg-zinc-800/40 transition-colors">
+                        <td className="px-5 py-3 font-semibold text-white flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-xs font-black flex-shrink-0">
                             {m.name.split(" ").map(n => n[0]).join("")}
                           </div>
                           {m.name}
                         </td>
                         <td className="px-5 py-3">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold border
                             ${m.plan === "Pro" ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"}`}>
                             {m.plan}
                           </span>
                         </td>
                         <td className="px-5 py-3 text-zinc-400">{m.date}</td>
                         <td className="px-5 py-3">
-                          <span className={`flex items-center gap-1.5 text-xs font-semibold ${m.status === "active" ? "text-emerald-400" : "text-zinc-500"}`}>
+                          <span className={`flex items-center gap-1.5 text-xs font-bold ${m.status === "active" ? "text-emerald-400" : "text-zinc-500"}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${m.status === "active" ? "bg-emerald-400" : "bg-zinc-600"}`} />
                             {m.status === "active" ? "Active" : "Inactive"}
                           </span>
@@ -402,9 +429,10 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
+
         </main>
 
-        <footer className="border-t border-zinc-800/60 px-6 py-4 text-center text-xs text-zinc-600">
+        <footer className="border-t border-zinc-900/60 px-6 py-5 text-center text-xs text-zinc-600 mt-auto">
           © {new Date().getFullYear()} Fitcore — Gym Manager Portal
         </footer>
       </div>
