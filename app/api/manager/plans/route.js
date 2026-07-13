@@ -1,4 +1,4 @@
-import handler from '../../../../routes/api/manager/plans';
+import handler from '../../../../backend/api/manager/plans';
 import { wrapHandler } from '../../../../backend/utils/app-router-adapter';
 
 export const GET = wrapHandler(handler);
