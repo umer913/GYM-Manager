@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       }
 
       // 3. Proximity Geolocation Verification (GPS check within 100 meters)
-      const gymLocation = getGymLocation();
+      const gymLocation = await getGymLocation();
       const distance = getDistanceInMeters(latitude, longitude, gymLocation.latitude, gymLocation.longitude);
 
       if (distance > 100) {

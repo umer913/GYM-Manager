@@ -37,8 +37,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "app/page.jsx",
-    "app/Home/page.jsx",
-    "lib/mongodb.j/s"
+    "app/Home/page.jsx"
   ],
   "exclude": [
     "node_modules"

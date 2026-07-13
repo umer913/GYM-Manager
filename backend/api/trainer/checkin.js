@@ -52,7 +52,7 @@ export default async function handler(req, res) {
           return res.status(403).json({ success: false, message: 'Trainer not found' });
 
         // 3. GPS proximity check
-        const gymLocation = getGymLocation();
+        const gymLocation = await getGymLocation();
         const distance = getDistanceInMeters(latitude, longitude, gymLocation.latitude, gymLocation.longitude);
 
         if (distance > 100) {

@@ -19,7 +19,7 @@ export default async function handler(req, res) {
           return res.status(200).json({
             success: true,
             token,
-            gymLocation: getGymLocation()
+            gymLocation: await getGymLocation()
           });
         } catch (error) {
           return res.status(500).json({ success: false, message: 'Failed to generate session' });
