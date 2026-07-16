@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import Card from "../../../components/Card";
+import { useToast } from "../../../components/ui/UIProvider";
 
 export default function SignupPage() {
   const router = useRouter();
+  const toast = useToast();
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
   const [loading, setLoading] = useState(false);
 
@@ -29,13 +31,13 @@ export default function SignupPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert(data.message || "Signup successful!");
+        toast.success(data.message || "Signup successful!");
         router.push("/Login");
       } else {
-        alert(data.message || "Signup failed");
+        toast.error(data.message || "Signup failed");
       }
     } catch {
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

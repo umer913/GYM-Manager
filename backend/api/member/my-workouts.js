@@ -27,6 +27,7 @@ export default async function handler(req, res) {
         weeklyDietPlan: user.weeklyDietPlan || null,
         planUpdatedAt: user.planUpdatedAt || null,
         planUpdatedBy: user.planUpdatedBy || null,
+        canAccessWorkouts: !!(user.plan?.allowsTrainer && user.membershipStatus === 'active' && (!user.membershipExpiresAt || new Date(user.membershipExpiresAt) >= new Date())),
         trainer: user.assignedTrainer
           ? {
               name: user.assignedTrainer.name,

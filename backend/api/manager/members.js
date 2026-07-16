@@ -39,7 +39,7 @@ export default async function handler(req, res) {
                 subscriptionBadge: hasPlan
                   ? {
                       label: member.plan?.allowsTrainer ? 'Premium' : 'Standard',
-                      icon: member.plan?.allowsTrainer ? '👑' : '💳',
+                      icon: member.plan?.allowsTrainer ? '  ' : '  ',
                     }
                   : null,
               };
@@ -87,6 +87,7 @@ export default async function handler(req, res) {
 
             // Update assigned trainer if provided
             if (assignedTrainerId !== undefined) {
+              const trainerChanged = String(member.assignedTrainer || '') !== String(assignedTrainerId || '');
               if (assignedTrainerId === null || assignedTrainerId === '') {
                 member.assignedTrainer = null;
               } else {
@@ -96,6 +97,13 @@ export default async function handler(req, res) {
                   return res.status(404).json({ success: false, message: 'Trainer not found' });
                 }
                 member.assignedTrainer = assignedTrainerId;
+              }
+              // Clear trainer-assigned plans when trainer is changed or removed
+              if (trainerChanged) {
+                member.weeklyWorkoutPlan = undefined;
+                member.weeklyDietPlan    = undefined;
+                member.planUpdatedAt     = undefined;
+                member.planUpdatedBy     = undefined;
               }
             }
 
@@ -125,13 +133,30 @@ export default async function handler(req, res) {
                 subscriptionBadge: hasPlan
                   ? {
                       label: updatedMember.plan?.allowsTrainer ? 'Premium' : 'Standard',
-                      icon: updatedMember.plan?.allowsTrainer ? '👑' : '💳',
+                      icon: updatedMember.plan?.allowsTrainer ? '  ' : '  ',
                     }
                   : null,
               }
             });
           } catch (error) {
             console.error('Update member error:', error);
+            return res.status(500).json({ success: false, message: 'Server error', error: error.message });
+          }
+
+        case 'DELETE':
+          try {
+            const { memberId } = req.body;
+            if (!memberId) {
+              return res.status(400).json({ success: false, message: 'Member ID is required' });
+            }
+            const member = await User.findById(memberId);
+            if (!member || member.role !== 'member') {
+              return res.status(404).json({ success: false, message: 'Member not found' });
+            }
+            await User.findByIdAndDelete(memberId);
+            return res.status(200).json({ success: true, message: 'Member deleted successfully' });
+          } catch (error) {
+            console.error('Delete member error:', error);
             return res.status(500).json({ success: false, message: 'Server error', error: error.message });
           }
 

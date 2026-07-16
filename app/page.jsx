@@ -73,10 +73,10 @@ export default function Gympage() {
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-neutral-100 font-sans selection:bg-red-500 selection:text-white">
 
       {/* HEADER */}
-      <header className="fixed top-0 w-full z-50 bg-gradient-to-b from-black/80 to-transparent p-6 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 group justify-between">
+      <header className="fixed top-0 w-full z-50 bg-gradient-to-b from-black/80 to-transparent px-6 py-4 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-          <div className="flex items-center gap-2 group cursor-pointer">
+          <div className="flex items-center gap-2 cursor-pointer group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6.5 6.5h1v11h-1zM16.5 6.5h1v11h-1z" fill="currentColor" stroke="none"/>
@@ -85,23 +85,32 @@ export default function Gympage() {
                 <line x1="7" y1="12" x2="17" y2="12" strokeWidth={2}/>
               </svg>
             </div>
-
             <span className="text-2xl font-black uppercase">
               Fit<span className="text-red-600">core</span>
             </span>
           </div>
-          <nav className="md:flex gap-8 text-sm text-neutral-300">
-            <a href="#about" className="hover:text-red-500">About</a>
-            <a href="#plans" className="hover:text-red-500">Plans</a>
-            <a href="#join" className="hover:text-red-500">Join</a>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-300">
+            <a href="#about" className="hover:text-red-500 transition-colors duration-200">About</a>
+            <a href="#plans" className="hover:text-red-500 transition-colors duration-200">Plans</a>
+            <a href="#join" className="hover:text-red-500 transition-colors duration-200">Join</a>
           </nav>
 
+          {/* Mobile nav — horizontal pill */}
+          <nav className="flex md:hidden items-center gap-4 text-xs text-neutral-300 bg-black/40 border border-white/10 rounded-full px-4 py-2 backdrop-blur-sm">
+            <a href="#about" className="hover:text-red-500 transition-colors duration-200">About</a>
+            <span className="text-zinc-600">·</span>
+            <a href="#plans" className="hover:text-red-500 transition-colors duration-200">Plans</a>
+            <span className="text-zinc-600">·</span>
+            <a href="#join" className="hover:text-red-500 transition-colors duration-200">Join</a>
+          </nav>
 
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative w-full h-screen min-h-[100svh] flex items-center justify-center overflow-hidden">
 
         {heroImages.map((src, index) => (
           <div
@@ -111,8 +120,9 @@ export default function Gympage() {
           >
             <img
               src={src}
-              className="object-cover w-full h-full scale-105"
+              className="w-full h-full object-cover object-center scale-105"
               alt="gym"
+              style={{ position: "absolute", inset: 0 }}
             />
 
             <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-zinc-900 via-transparent to-black/80"></div>

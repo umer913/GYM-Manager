@@ -35,6 +35,13 @@ export default async function handler(req, res) {
         }
 
         member.assignedTrainer = trainer._id;
+
+        // Clear trainer-assigned plans when switching to a new trainer
+        member.weeklyWorkoutPlan = undefined;
+        member.weeklyDietPlan    = undefined;
+        member.planUpdatedAt     = undefined;
+        member.planUpdatedBy     = undefined;
+
         await member.save();
 
         const updatedMember = await User.findById(member._id)

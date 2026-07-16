@@ -124,6 +124,7 @@ export default async function handler(req, res) {
           duration: plan.duration,
           allowsTrainer: plan.allowsTrainer,
           features: plan.features,
+          theme: plan.theme || 'normal',
           createdAt: plan.createdAt
         })),
         canChooseTrainer: !!(user.plan && user.plan.allowsTrainer && user.membershipStatus === 'active' && (!user.membershipExpiresAt || new Date(user.membershipExpiresAt) >= now)),

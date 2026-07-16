@@ -59,6 +59,9 @@ const userSchema = new mongoose.Schema({
   planUpdatedAt:  { type: Date },
   planUpdatedBy:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // trainer's _id
 
+  // ── Manager-only fields ──────────────────────────────────────────────────
+  planTheme:  { type: String, enum: ['normal', 'good', 'very-good'], default: 'normal' },
+
   // ── Auth fields (all roles) ──────────────────────────────────────────────
   createdAt:  { type: Date, default: Date.now },
   otp:        { type: String },

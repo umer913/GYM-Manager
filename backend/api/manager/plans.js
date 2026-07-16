@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
         case 'POST':
           try {
-            const { name, price, duration, allowsTrainer, features } = req.body;
+            const { name, price, duration, allowsTrainer, features, theme } = req.body;
             if (!name || price === undefined || !duration) {
               return res.status(400).json({ success: false, message: 'Name, price, and duration are required' });
             }
@@ -62,7 +62,8 @@ export default async function handler(req, res) {
               price: Number(price),
               duration,
               allowsTrainer: !!allowsTrainer,
-              features: featuresArray
+              features: featuresArray,
+              theme: theme || 'normal'
             });
 
             return res.status(201).json({ success: true, message: 'Plan created successfully', plan });
@@ -74,7 +75,7 @@ export default async function handler(req, res) {
         case 'PUT':
           try {
             const { id } = req.query;
-            const { name, price, duration, allowsTrainer, features } = req.body;
+            const { name, price, duration, allowsTrainer, features, theme } = req.body;
 
             const planId = id || req.body._id;
             if (!planId) {
@@ -90,6 +91,7 @@ export default async function handler(req, res) {
             if (price !== undefined) plan.price = Number(price);
             if (duration) plan.duration = duration;
             if (allowsTrainer !== undefined) plan.allowsTrainer = !!allowsTrainer;
+            if (theme) plan.theme = theme;
             
             if (features !== undefined) {
               let featuresArray = [];

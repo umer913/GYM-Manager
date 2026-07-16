@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 import { AppProvider } from '../context/AppContext';
+import { UIProvider } from '../components/ui/UIProvider';
 
 export const metadata: Metadata = {
   title: 'Next.js App',
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppProvider>
-          {children}
+          <UIProvider>
+            {children}
+          </UIProvider>
         </AppProvider>
       </body>
     </html>
