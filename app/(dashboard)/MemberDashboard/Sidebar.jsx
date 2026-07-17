@@ -56,6 +56,15 @@ const NAV_LINKS = [
   {
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+        <path d="M3 3h18v18H3V3z" /><circle cx="8.5" cy="8.5" r="0.5" fill="currentColor" />
+        <rect x="7" y="12" width="10" height="2" rx="1" /><rect x="7" y="16" width="6" height="2" rx="1" />
+      </svg>
+    ),
+    label: "Store", path: "/MemberDashboard/store",
+  },
+  {
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
       </svg>
     ),
