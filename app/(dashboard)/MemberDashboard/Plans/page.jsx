@@ -92,29 +92,17 @@ export default function MemberPlansPage() {
     setSubscribingPlanId(planId);
     setToast("");
 
-    const { data: result, ok } = await apiCall("/api/member/subscribe-plan", {
+    const { data, ok } = await apiCall("/api/payment/create-checkout", {
       method: "POST",
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ type: "plan", planId }),
     });
 
-    if (ok && result.success) {
-      setData((prev) => ({
-        ...prev,
-        member: {
-          ...prev.member,
-          plan: result.member.plan,
-          trainer: result.member.trainer,
-          membershipStatus: result.member.membershipStatus,
-          membershipExpiresAt: result.member.membershipExpiresAt,
-          daysRemaining: 30,
-        },
-      }));
-      setToast(result.message || 'Subscription updated.');
+    if (ok && data.success) {
+      window.location.href = data.url;
     } else {
-      setToast(result.message || 'Failed to subscribe.');
+      setToast(data.message || "Failed to start checkout.");
+      setSubscribingPlanId("");
     }
-
-    setSubscribingPlanId("");
   };
 
   if (loading) {

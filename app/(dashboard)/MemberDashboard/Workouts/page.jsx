@@ -147,7 +147,7 @@ function TrainerDietPlan({ weeklyDietPlan, trainer }) {
   if (!weeklyDietPlan || (!weeklyDietPlan.calories && !weeklyDietPlan.meals?.length)) {
     return (
       <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-8 text-center">
-        <span className="text-4xl block mb-3">🥗</span>
+        <span className="text-4xl block mb-3"></span>
         <p className="text-zinc-400 font-semibold">No diet plan yet</p>
         <p className="text-xs text-zinc-500 mt-2">Your trainer hasn&apos;t set a diet plan for you yet.</p>
       </div>

@@ -1,7 +1,7 @@
 import dbConnect from '../../lib/mongodb';
 import User from '../../models/User';
 import Plan from '../../models/Plan';
-import Trainer from '../../models/Trainer';
+
 import { authenticate, authorizeRoles } from '../../utils/auth';
 
 function getSubscriptionState(member) {
@@ -92,8 +92,8 @@ export default async function handler(req, res) {
                 member.assignedTrainer = null;
               } else {
                 // Verify trainer exists
-                const trainer = await Trainer.findById(assignedTrainerId);
-                if (!trainer) {
+                const trainer = await User.findById(assignedTrainerId);
+                if (!trainer || trainer.role !== 'trainer') {
                   return res.status(404).json({ success: false, message: 'Trainer not found' });
                 }
                 member.assignedTrainer = assignedTrainerId;

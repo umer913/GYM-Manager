@@ -54,6 +54,15 @@ const NAV_LINKS = [
   },
   {
     icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+        <path d="M3 3h18v18H3V3z" /><circle cx="8.5" cy="8.5" r="0.5" fill="currentColor" />
+        <rect x="7" y="12" width="10" height="2" rx="1" /><rect x="7" y="16" width="6" height="2" rx="1" />
+      </svg>
+    ),
+    label: "Manage Store", path: "/GymManagerDashboard/store",
+  },
+  {
+    icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <circle cx="12" cy="12" r="3" />
