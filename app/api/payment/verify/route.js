@@ -5,7 +5,9 @@ import dbConnect from "../../../../backend/lib/mongodb";
 import User from "../../../../backend/models/User";
 import Plan from "../../../../backend/models/Plan";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 
 async function handler(req, res) {
   if (req.method !== "POST") {
@@ -20,7 +22,7 @@ async function handler(req, res) {
       if (!sessionId) return res.status(400).json({ success: false, message: "sessionId is required" });
 
       // Retrieve the session from Stripe
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
       if (session.payment_status !== "paid") {
         return res.status(400).json({ success: false, message: "Payment not completed" });

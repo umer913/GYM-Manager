@@ -4,7 +4,9 @@ import { authenticate } from "../../../../backend/utils/auth";
 import dbConnect from "../../../../backend/lib/mongodb";
 import Plan from "../../../../backend/models/Plan";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 
 async function handler(req, res) {
   if (req.method !== "POST") {
@@ -25,7 +27,7 @@ async function handler(req, res) {
         const plan = await Plan.findById(planId);
         if (!plan) return res.status(404).json({ success: false, message: "Plan not found" });
 
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
           payment_method_types: ["card"],
           mode: "payment",
           line_items: [
@@ -36,7 +38,7 @@ async function handler(req, res) {
                   name: `${plan.name} — Gym Membership`,
                   description: `${plan.duration} · ${plan.allowsTrainer ? "Includes Personal Trainer" : "No Trainer"}`,
                 },
-                unit_amount: Math.round(plan.price * 100), // Stripe expects cents/paisa
+                unit_amount: Math.round(plan.price * 100),
               },
               quantity: 1,
             },
@@ -69,7 +71,7 @@ async function handler(req, res) {
           quantity: item.quantity,
         }));
 
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
           payment_method_types: ["card"],
           mode: "payment",
           line_items: lineItems,

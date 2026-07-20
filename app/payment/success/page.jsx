@@ -1,10 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiCall } from "../../../utils/api";
 
 export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 flex items-center justify-center p-6">
+        <div className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center space-y-5 shadow-2xl">
+          <div className="w-14 h-14 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-white font-bold">Loading...</p>
+        </div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
+
+function PaymentSuccessContent() {
   const router = useRouter();
   const params = useSearchParams();
   const sessionId = params.get("session_id");
@@ -16,11 +31,17 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     if (!sessionId) { setState("error"); setMessage("Invalid session."); return; }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     (async () => {
       const { data, ok } = await apiCall("/api/payment/verify", {
         method: "POST",
         body: JSON.stringify({ sessionId }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeout);
 
       if (ok && data.success) {
         setState("success");
@@ -30,6 +51,8 @@ export default function PaymentSuccessPage() {
         setMessage(data.message || "Verification failed.");
       }
     })();
+
+    return () => { clearTimeout(timeout); };
   }, [sessionId]);
 
   const redirect = () => {

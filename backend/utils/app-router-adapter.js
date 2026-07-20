@@ -53,7 +53,22 @@ export function wrapHandler(pagesHandler) {
       },
     };
 
-    pagesHandler(req, res);
+    try {
+      const result = pagesHandler(req, res);
+      if (result && typeof result.catch === 'function') {
+        result.catch((err) => {
+          if (!res._responded) {
+            console.error('Unhandled handler error:', err);
+            resolveResponse({ status: 500, data: { success: false, message: err.message || 'Internal server error' } });
+          }
+        });
+      }
+    } catch (err) {
+      if (!res._responded) {
+        console.error('Handler sync error:', err);
+        resolveResponse({ status: 500, data: { success: false, message: err.message || 'Internal server error' } });
+      }
+    }
 
     const { status, data } = await responsePromise;
     return NextResponse.json(data, { status });
