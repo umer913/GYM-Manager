@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Sidebar from "../Sidebar";
 import { apiCall } from "../../../../utils/api";
-import { useToast, useConfirm } from "../../../../components/ui/UIProvider";
+import { useToast } from "../../../../components/ui/UIProvider";
+import OrderModal from "../../../../components/ui/OrderModal";
 
 export default function MemberStorePage() {
-  const router = useRouter();
   const toast = useToast();
-  const confirm = useConfirm();
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +15,7 @@ export default function MemberStorePage() {
   const [cart, setCart] = useState({});
   const [showCart, setShowCart] = useState(false);
   const [placing, setPlacing] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderForm, setOrderForm] = useState({ shippingAddress: "", contactPhone: "", notes: "" });
 
   const fetchProducts = async () => {
@@ -60,33 +59,9 @@ export default function MemberStorePage() {
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const placeOrder = async () => {
-    if (!cartItems.length) return;
-
-    // Validation
-    if (!orderForm.shippingAddress.trim()) {
-      toast.error("Shipping address is required.");
-      return;
-    }
-    if (!orderForm.contactPhone.trim()) {
-      toast.error("Contact phone number is required.");
-      return;
-    }
-    if (!/^[0-9+\-\s]{7,15}$/.test(orderForm.contactPhone.trim())) {
-      toast.error("Please enter a valid phone number.");
-      return;
-    }
-
-    const confirmed = await confirm({
-      variant: "save",
-      title: "Proceed to Payment?",
-      message: `Rs ${cartTotal.toLocaleString()} for ${cartCount} item${cartCount > 1 ? "s" : ""}. You'll be redirected to Stripe for secure payment.`,
-      confirmText: "Pay Now",
-      cancelText: "Review Cart",
-    });
-    if (!confirmed) return;
-
+  const handleConfirmOrder = async () => {
     setPlacing(true);
+    setShowOrderModal(false);
     const { data, ok } = await apiCall("/api/payment/create-checkout", {
       method: "POST",
       body: JSON.stringify({
@@ -108,6 +83,27 @@ export default function MemberStorePage() {
     } else {
       toast.error(data.message || "Failed to start checkout.");
     }
+  };
+
+  const placeOrder = () => {
+    if (!cartItems.length) return;
+
+    // Validation
+    if (!orderForm.shippingAddress.trim()) {
+      toast.error("Shipping address is required.");
+      return;
+    }
+    if (!orderForm.contactPhone.trim()) {
+      toast.error("Contact phone number is required.");
+      return;
+    }
+    if (!/^[0-9+\-\s]{7,15}$/.test(orderForm.contactPhone.trim())) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+
+    setShowCart(false);
+    setShowOrderModal(true);
   };
 
   const inputClass = "w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-red-500 transition";
@@ -295,9 +291,9 @@ export default function MemberStorePage() {
                 <div className="space-y-3 pt-4 border-t border-zinc-800">
                   <div className="space-y-2">
                     <input value={orderForm.shippingAddress} onChange={e => setOrderForm({...orderForm, shippingAddress: e.target.value})}
-                      className={inputClass} placeholder="Shipping address (optional)" />
+                      className={inputClass} placeholder="Shipping address" />
                     <input value={orderForm.contactPhone} onChange={e => setOrderForm({...orderForm, contactPhone: e.target.value})}
-                      className={inputClass} placeholder="Contact phone (optional)" />
+                      className={inputClass} placeholder="Contact phone" />
                     <input value={orderForm.notes} onChange={e => setOrderForm({...orderForm, notes: e.target.value})}
                       className={inputClass} placeholder="Order notes (optional)" />
                   </div>
@@ -314,6 +310,18 @@ export default function MemberStorePage() {
             )}
           </div>
         </div>
+      )}
+
+      {showOrderModal && (
+        <OrderModal
+          cartItems={cartItems}
+          cartTotal={cartTotal}
+          cartCount={cartCount}
+          orderForm={orderForm}
+          placing={placing}
+          onConfirm={handleConfirmOrder}
+          onCancel={() => setShowOrderModal(false)}
+        />
       )}
     </div>
   );

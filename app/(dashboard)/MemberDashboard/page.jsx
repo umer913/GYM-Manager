@@ -24,34 +24,31 @@ function StatCard({ label, value, sub, accent = "from-red-500 to-orange-500", bi
 
   return (
     <div
-      className={`relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-700 group transition-all duration-700 p-6
+      className={`relative p-[1px] rounded-2xl bg-gradient-to-br from-zinc-700 to-zinc-900 hover:-translate-y-1 transition-all duration-300
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-      style={{ transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms, border-color 0.3s` }}
+      style={{ transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms` }}
     >
-      {/* large faded background word */}
-      <span className="absolute -bottom-3 -right-2 text-7xl font-black uppercase tracking-tighter text-white/[0.04] select-none pointer-events-none leading-none">
-        {bigLabel}
-      </span>
+      <div className="rounded-2xl bg-zinc-950/95 p-6 relative overflow-hidden group h-full">
+        {/* large faded background word */}
+        <span className="absolute -bottom-3 -right-2 text-7xl font-black uppercase tracking-tighter text-white/[0.04] select-none pointer-events-none leading-none">
+          {bigLabel}
+        </span>
 
-      {/* top accent bar */}
-      <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${accent}`} />
+        {/* top accent bar */}
+        <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${accent}`} />
 
-      {/* glow blob */}
-      <div className={`absolute -top-8 -right-8 w-28 h-28 rounded-full bg-gradient-to-br ${accent} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500`} />
+        {/* glow blob */}
+        <div className={`absolute -top-8 -right-8 w-28 h-28 rounded-full bg-gradient-to-br ${accent} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500`} />
 
-      <div className="relative z-10">
-        {/* label */}
-        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 mb-3">{label}</p>
-
-        {/* main value — large gradient text */}
-        <p className={`text-4xl font-black leading-none text-transparent bg-clip-text bg-gradient-to-r ${accent}`}>
-          {value}
-        </p>
-
-        {/* sub text */}
-        {sub && (
-          <p className="text-xs text-zinc-500 mt-2 leading-snug">{sub}</p>
-        )}
+        <div className="relative z-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 mb-3">{label}</p>
+          <p className={`text-4xl font-black leading-none text-transparent bg-clip-text bg-gradient-to-r ${accent}`}>
+            {value}
+          </p>
+          {sub && (
+            <p className="text-xs text-zinc-500 mt-2 leading-snug">{sub}</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -244,27 +241,30 @@ export default function MemberDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
             {/* weekly grid */}
-            <div className="rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-5">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="font-black text-white uppercase tracking-tight text-sm">This Week</h3>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-                  {weekCount} / 7 days
-                </span>
-              </div>
-              <p className="text-[11px] text-zinc-500 mb-4">
-                {weekCount === 0
-                  ? "No check-ins yet. Let's go!  "
-                  : weekCount < 3
-                  ? `${weekCount} days — keep building the habit `
-                  : `${weekCount} days — great consistency! 🔥`}
-              </p>
-              <WeekGrid data={weekAttendance} />
-              {/* thin progress bar */}
-              <div className="mt-4 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-700"
-                  style={{ width: `${(weekCount / 7) * 100}%` }}
-                />
+            <div className="relative p-[1px] rounded-2xl bg-gradient-to-br from-zinc-700 to-zinc-900 hover:-translate-y-1 transition-transform duration-300 flex flex-col h-full">
+              <div className="rounded-2xl bg-zinc-950/95 p-5 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-black text-white uppercase tracking-tight text-sm">This Week</h3>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                    {weekCount} / 7 days
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 mb-3">
+                  {weekCount === 0
+                    ? "No check-ins yet. Let's go!"
+                    : weekCount < 3
+                    ? "Keep building the habit — every day counts."
+                    : "Great consistency this week! 🔥"}
+                </p>
+                <div className="flex-1 flex flex-col justify-center">
+                  <WeekGrid data={weekAttendance} />
+                </div>
+                <div className="mt-4 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-700"
+                    style={{ width: `${(weekCount / 7) * 100}%` }}
+                  />
+                </div>
               </div>
             </div>
 
@@ -377,21 +377,23 @@ export default function MemberDashboard() {
             </div>
           ) : (
             /* no plan empty state */
-            <div className="rounded-2xl bg-zinc-900/60 border border-dashed border-zinc-700 p-10 text-center">
-              <span className="text-5xl block mb-3">💳</span>
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">No Active Plan</h3>
-              <p className="text-sm text-zinc-400 mt-2 max-w-sm mx-auto leading-relaxed">
-                Contact the gym admin to get assigned a plan and start your fitness journey.
-              </p>
-              <button
-                onClick={() => router.push("/MemberDashboard/Plans")}
-                className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white shadow-lg shadow-red-500/20 cursor-pointer"
-              >
-                Browse Plans
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
+            <div className="relative p-[1px] rounded-2xl bg-gradient-to-br from-zinc-700 to-zinc-900 hover:-translate-y-1 transition-transform duration-300">
+              <div className="rounded-2xl bg-zinc-950/95 p-10 text-center">
+                <span className="text-5xl block mb-3">💳</span>
+                <h3 className="text-xl font-black uppercase tracking-tight text-white">No Active Plan</h3>
+                <p className="text-sm text-zinc-400 mt-2 max-w-sm mx-auto leading-relaxed">
+                  Contact the gym admin to get assigned a plan and start your fitness journey.
+                </p>
+                <button
+                  onClick={() => router.push("/MemberDashboard/Plans")}
+                  className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white shadow-lg shadow-red-500/20 cursor-pointer"
+                >
+                  Browse Plans
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           )}
 
